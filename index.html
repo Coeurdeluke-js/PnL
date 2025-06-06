@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Trading - Excel Interactivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Análisis de Trading Profesional</h1>
+            <p>Análisis detallado de operaciones de derivados para optimización de estrategias</p>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('resumen')">📈 Resumen</div>
+            <div class="tab" onclick="showTab('operaciones')">📋 Operaciones</div>
+            <div class="tab" onclick="showTab('analisis')">🔍 Análisis</div>
+            <div class="tab" onclick="showTab('estrategias')">💡 Estrategias</div>
+        </div>
+
+        <div id="resumen" class="tab-content active">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="totalPnL">$0.00</div>
+                    <div class="metric-label">P&L Total</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="winRate">0%</div>
+                    <div class="metric-label">Tasa de Éxito</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="totalTrades">0</div>
+                    <div class="metric-label">Total Operaciones</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avgPnL">$0.00</div>
+                    <div class="metric-label">P&L Promedio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="bestTrade">$0.00</div>
+                    <div class="metric-label">Mejor Operación</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="worstTrade">$0.00</div>
+                    <div class="metric-label">Peor Operación</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">📊 Resumen por Símbolo</div>
+                <table id="symbolSummary">
+                    <thead>
+                        <tr>
+                            <th>Símbolo</th>
+                            <th>Operaciones</th>
+                            <th>P&L Total</th>
+                            <th>P&L Promedio</th>
+                            <th>Tasa Éxito</th>
+                            <th>Mejor</th>
+                            <th>Peor</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="operaciones" class="tab-content">
+            <div class="table-container">
+                <div class="table-header">📋 Todas las Operaciones</div>
+                <table id="allTrades">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Símbolo</th>
+                            <th>Dirección</th>
+                            <th>Cantidad</th>
+                            <th>Precio Entrada</th>
+                            <th>Precio Salida</th>
+                            <th>P&L</th>
+                            <th>Rendimiento %</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="analisis" class="tab-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="maxDrawdown">0%</div>
+                    <div class="metric-label">Drawdown Máximo</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="sharpeRatio">0.00</div>
+                    <div class="metric-label">Ratio Sharpe</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="profitFactor">0.00</div>
+                    <div class="metric-label">Factor de Beneficio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avgWin">$0.00</div>
+                    <div class="metric-label">Ganancia Promedio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avgLoss">$0.00</div>
+                    <div class="metric-label">Pérdida Promedio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="riskReward">0.00</div>
+                    <div class="metric-label">Ratio Riesgo/Beneficio</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">📈 Análisis de Rendimiento Diario</div>
+                <table id="dailyAnalysis">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Operaciones</th>
+                            <th>P&L Diario</th>
+                            <th>P&L Acumulado</th>
+                            <th>Tasa Éxito</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="estrategias" class="tab-content">
+            <div class="recommendations">
+                <h3>🎯 Recomendaciones Estratégicas</h3>
+                <ul id="strategicRecommendations">
+                    <li>Cargando análisis...</li>
+                </ul>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">💼 Análisis de Gestión de Riesgo</div>
+                <table id="riskAnalysis">
+                    <thead>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor Actual</th>
+                            <th>Recomendado</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <button class="download-btn" onclick="downloadExcel()">
+            📥 Descargar Análisis Completo (.xlsx)
+        </button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
