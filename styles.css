@@ -264,3 +264,42 @@ tr:hover {
         font-size: 0.9rem;
     }
 }
+
+.file-upload {
+    margin-top: 20px;
+}
+
+.file-input {
+    display: none;
+}
+
+.download-button {
+    background: #2a2a2a;
+    color: #fafafa;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #333;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    font-family: 'Inter', sans-serif;
+}
+
+.download-button:hover:not(:disabled) {
+    background: #ec4d58;
+    border-color: #ec4d58;
+    color: #121212;
+}
+
+.download-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+display: inline-block;
+}
+
+.upload-button:hover {
+    background: #ec4d58;
+    border-color: #ec4d58;
+    color: #121212;
+}
