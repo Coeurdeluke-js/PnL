@@ -70,8 +70,29 @@ function parseCSV(csvText) {
 }
 
 // Función para calcular métricas principales
+// Eliminar la constante rawData y reemplazarla por:
+let currentData = '';
+
+// Agregar el manejador de archivos CSV
+document.getElementById('csvFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentData = e.target.result;
+            trades = [];
+            symbolSummary = {};
+            dailyAnalysis = {};
+            calculateMetrics();
+            updateTables();
+        };
+        reader.readAsText(file);
+    }
+});
+
+// Modificar la función calculateMetrics para usar currentData en lugar de rawData
 function calculateMetrics() {
-    trades = parseCSV(rawData);
+    trades = parseCSV(currentData);
     
     if (trades.length === 0) {
         console.error('No se pudieron cargar los datos');
@@ -428,395 +449,127 @@ function showTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Función para descargar Excel
-function downloadExcel() {
-    try {
-        // Crear un nuevo workbook
-        const wb = XLSX.utils.book_new();
-        
-        // Hoja 1: Resumen general
-        const summaryData = [
-            ['Métrica', 'Valor'],
-            ['P&L Total', `$${trades.reduce((sum, trade) => sum + parseFloat(trade['Closed P&L']), 0).toFixed(2)}`],
-            ['Total Operaciones', trades.length],
-            ['Tasa de Éxito', `${((trades.filter(trade => parseFloat(trade['Closed P&L']) > 0).length / trades.length) * 100).toFixed(1)}%`],
-            ['Mejor Operación', `$${Math.max(...trades.map(trade => parseFloat(trade['Closed P&L']))).toFixed(2)}`],
-            ['Peor Operación', `$${Math.min(...trades.map(trade => parseFloat(trade['Closed P&L']))).toFixed(2)}`]
-        ];
-        
-        const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-        XLSX.utils.book_append_sheet(wb, summaryWs, 'Resumen');
-        
-        // Hoja 2: Todas las operaciones
-        const tradesWs = XLSX.utils.json_to_sheet(trades);
-        XLSX.utils.book_append_sheet(wb, tradesWs, 'Operaciones');
-        
-        // Hoja 3: Resumen por símbolo
-        const symbolData = Object.entries(symbolSummary).map(([symbol, data]) => ({
-            Símbolo: symbol,
-            Operaciones: data.trades,
-            'P&L Total': data.totalPnL.toFixed(2),
-            'P&L Promedio': (data.totalPnL / data.trades).toFixed(2),
-            'Tasa Éxito %': ((data.wins / data.trades) * 100).toFixed(1),
-            'Mejor Operación': data.bestTrade.toFixed(2),
-      'Peor Operación': data.worstTrade.toFixed(2)
-        }));
-        
-        const symbolWs = XLSX.utils.json_to_sheet(symbolData);
-        XLSX.utils.book_append_sheet(wb, symbolWs, 'Resumen por Símbolo');
-        
-        // Hoja 4: Análisis diario
-        const dailyData = Object.entries(dailyAnalysis).map(([date, data]) => ({
-            Fecha: date,
-            Operaciones: data.trades,
-            'P&L Diario': data.totalPnL.toFixed(2),
-            'Tasa Éxito %': ((data.wins / data.trades) * 100).toFixed(1)
-        }));
-        
-        const dailyWs = XLSX.utils.json_to_sheet(dailyData);
-        XLSX.utils.book_append_sheet(wb, dailyWs, 'Análisis Diario');
-        
-        // Hoja 5: Métricas avanzadas
-        const pnlValues = trades.map(trade => parseFloat(trade['Closed P&L']));
-        const winningTrades = pnlValues.filter(pnl => pnl > 0);
-        const losingTrades = pnlValues.filter(pnl => pnl < 0);
-        
-        const totalWins = winningTrades.reduce((sum, win) => sum + win, 0);
-        const totalLosses = Math.abs(losingTrades.reduce((sum, loss) => sum + loss, 0));
-        const avgWin = winningTrades.length > 0 ? totalWins / winningTrades.length : 0;
-        const avgLoss = losingTrades.length > 0 ? totalLosses / losingTrades.length : 0;
-        const profitFactor = totalLosses > 0 ? totalWins / totalLosses : 0;
-        const riskReward = avgLoss > 0 ? avgWin / avgLoss : 0;
-        
-        // Calcular drawdown máximo
-        let cumulativePnL = 0;
-        let maxCumulative = 0;
-        let maxDrawdown = 0;
-        
-        pnlValues.forEach(pnl => {
-            cumulativePnL += pnl;
-            maxCumulative = Math.max(maxCumulative, cumulativePnL);
-            const drawdown = maxCumulative > 0 ? ((maxCumulative - cumulativePnL) / maxCumulative) * 100 : 0;
-            maxDrawdown = Math.max(maxDrawdown, drawdown);
-        });
-        
-        const advancedData = [
-            ['Métrica Avanzada', 'Valor'],
-            ['Drawdown Máximo', `${maxDrawdown.toFixed(2)}%`],
-            ['Factor de Beneficio', profitFactor.toFixed(2)],
-            ['Ganancia Promedio', `$${avgWin.toFixed(2)}`],
-            ['Pérdida Promedio', `$${avgLoss.toFixed(2)}`],
-            ['Ratio Riesgo/Beneficio', riskReward.toFixed(2)],
-            ['Total Operaciones Ganadoras', winningTrades.length],
-            ['Total Operaciones Perdedoras', losingTrades.length],
-            ['Beneficio Total de Ganadoras', `$${totalWins.toFixed(2)}`],
-            ['Pérdida Total de Perdedoras', `$${totalLosses.toFixed(2)}`]
-        ];
-        
-        const advancedWs = XLSX.utils.aoa_to_sheet(advancedData);
-        XLSX.utils.book_append_sheet(wb, advancedWs, 'Métricas Avanzadas');
-        
-        // Hoja 6: Recomendaciones estratégicas
-        const recommendations = document.querySelectorAll('#strategicRecommendations li');
-        const recommendationData = [['Recomendaciones Estratégicas']];
-        recommendations.forEach((rec, index) => {
-            recommendationData.push([`${index + 1}. ${rec.textContent}`]);
-        });
-        
-        const recommendationWs = XLSX.utils.aoa_to_sheet(recommendationData);
-        XLSX.utils.book_append_sheet(wb, recommendationWs, 'Recomendaciones');
-        
-        // Generar y descargar el archivo
-        const fileName = `Analisis_Trading_${new Date().toISOString().split('T')[0]}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-        
-        // Mostrar mensaje de éxito
-        showNotification('✅ Archivo Excel descargado exitosamente', 'success');
-        
-    } catch (error) {
-        console.error('Error al generar Excel:', error);
-        showNotification('❌ Error al generar el archivo Excel', 'error');
-    }
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type = 'info') {
-    // Crear elemento de notificación
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
+// Función para exportar a Excel
+function exportToExcel() {
+    // Crear un nuevo libro de trabajo
+    const wb = XLSX.utils.book_new();
     
-    // Estilos de la notificación
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        z-index: 1000;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: all 0.3s ease;
-        max-width: 300px;
-        word-wrap: break-word;
-    `;
+    // Crear hoja de Resumen
+    const summaryData = [
+        ['Métricas Generales'],
+        ['P&L Total', document.getElementById('totalPnL').textContent],
+        ['Tasa de Éxito', document.getElementById('winRate').textContent],
+        ['Total Operaciones', document.getElementById('totalTrades').textContent],
+        ['P&L Promedio', document.getElementById('avgPnL').textContent],
+        ['Mejor Operación', document.getElementById('bestTrade').textContent],
+        ['Peor Operación', document.getElementById('worstTrade').textContent],
+        []
+    ];
     
-    // Colores según el tipo
-    switch (type) {
-        case 'success':
-            notification.style.background = '#10b981';
-            break;
-        case 'error':
-            notification.style.background = '#ef4444';
-            break;
-        case 'warning':
-            notification.style.background = '#f59e0b';
-            break;
-        default:
-            notification.style.background = '#6366f1';
-    }
-    
-    // Agregar al DOM
-    document.body.appendChild(notification);
-    
-    // Mostrar animación
-    setTimeout(() => {
-        notification.style.opacity = '1';
-        notification.style.transform = 'translateX(0)';
-    }, 100);
-    
-    // Remover después de 3 segundos
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 3000);
-}
-
-// Función para formatear números con separadores de miles
-function formatNumber(num, decimals = 2) {
-    return new Intl.NumberFormat('es-AR', {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals
-    }).format(num);
-}
-
-// Función para formatear moneda
-function formatCurrency(amount, currency = 'USD') {
-    return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: currency,
-        minimumFractionDigits: 2
-    }).format(amount);
-}
-
-// Función para calcular correlaciones entre símbolos
-function calculateSymbolCorrelations() {
-    const correlations = {};
-    const symbols = Object.keys(symbolSummary);
-    
-    // Agrupar operaciones por fecha y símbolo
-    const dailyReturns = {};
+    // Crear hoja de Operaciones
+    const tradesData = [
+        ['Fecha', 'Símbolo', 'Dirección', 'Cantidad', 'Precio Entrada', 'Precio Salida', 'P&L', 'Rendimiento %']
+    ];
     
     trades.forEach(trade => {
-        const date = trade['Trade Time(UTC+0)'].split(' ')[0];
-        const symbol = trade.Contracts;
-        const entryPrice = parseFloat(trade['Entry Price']);
-        const exitPrice = parseFloat(trade['Exit Price']);
-        const returnPct = ((exitPrice - entryPrice) / entryPrice) * 100;
-        
-        if (!dailyReturns[date]) {
-            dailyReturns[date] = {};
-        }
-        
-        if (!dailyReturns[date][symbol]) {
-            dailyReturns[date][symbol] = [];
-        }
-        
-        dailyReturns[date][symbol].push(returnPct);
+        tradesData.push([
+            trade['Trade Time(UTC+0)'],
+            trade['Contracts'],
+            trade['Closing Direction'],
+            trade['Qty'],
+            trade['Entry Price'],
+            trade['Exit Price'],
+            trade['Closed P&L'],
+            ((trade['Exit Price'] - trade['Entry Price']) / trade['Entry Price'] * 100).toFixed(2)
+        ]);
     });
-    
-    // Calcular rendimientos promedio diarios por símbolo
-    const symbolDailyReturns = {};
-    Object.keys(dailyReturns).forEach(date => {
-        Object.keys(dailyReturns[date]).forEach(symbol => {
-            if (!symbolDailyReturns[symbol]) {
-                symbolDailyReturns[symbol] = [];
-            }
-            const avgReturn = dailyReturns[date][symbol].reduce((sum, ret) => sum + ret, 0) / dailyReturns[date][symbol].length;
-            symbolDailyReturns[symbol].push(avgReturn);
-        });
-    });
-    
-    return symbolDailyReturns;
+
+    // Crear hojas de trabajo
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+    const wsTrades = XLSX.utils.aoa_to_sheet(tradesData);
+
+    // Aplicar estilos
+    wsSummary['!cols'] = [{ wch: 20 }, { wch: 15 }];
+    wsTrades['!cols'] = Array(8).fill({ wch: 15 });
+
+    // Agregar fórmulas
+    const lastRow = tradesData.length;
+    wsTrades[`H2:H${lastRow}`] = { t: 'n', f: `(F2-E2)/E2*100` };
+
+    // Agregar las hojas al libro
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Resumen');
+    XLSX.utils.book_append_sheet(wb, wsTrades, 'Operaciones');
+
+    // Guardar el archivo
+    XLSX.writeFile(wb, 'Análisis_Trading.xlsm');
 }
 
-// Función para calcular estadísticas de volatilidad
-function calculateVolatilityStats() {
-    const volatilityStats = {};
-    
-    Object.entries(symbolSummary).forEach(([symbol, data]) => {
-        const symbolTrades = trades.filter(trade => trade.Contracts === symbol);
-        const returns = symbolTrades.map(trade => {
-            const entryPrice = parseFloat(trade['Entry Price']);
-            const exitPrice = parseFloat(trade['Exit Price']);
-            return ((exitPrice - entryPrice) / entryPrice) * 100;
-        });
-        
-        if (returns.length > 1) {
-            const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
-            const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / (returns.length - 1);
-            const volatility = Math.sqrt(variance);
-            
-            volatilityStats[symbol] = {
-                volatility: volatility.toFixed(2),
-                avgReturn: avgReturn.toFixed(2),
-                trades: returns.length
-            };
-        }
-    });
-    
-    return volatilityStats;
-}
-
-// Función para exportar datos como JSON
-function exportAsJSON() {
-    const exportData = {
-        summary: {
-            totalPnL: trades.reduce((sum, trade) => sum + parseFloat(trade['Closed P&L']), 0),
-            totalTrades: trades.length,
-            winRate: (trades.filter(trade => parseFloat(trade['Closed P&L']) > 0).length / trades.length) * 100,
-            bestTrade: Math.max(...trades.map(trade => parseFloat(trade['Closed P&L']))),
-            worstTrade: Math.min(...trades.map(trade => parseFloat(trade['Closed P&L'])))
-        },
-        trades: trades,
-        symbolSummary: symbolSummary,
-        dailyAnalysis: dailyAnalysis,
-        volatilityStats: calculateVolatilityStats(),
-        exportDate: new Date().toISOString()
-    };
-    
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `trading_analysis_${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    showNotification('📄 Datos exportados como JSON', 'success');
-}
-
-// Función para resetear y recargar datos
-function resetData() {
-    trades = [];
-    symbolSummary = {};
-    dailyAnalysis = {};
-    
-    // Limpiar todas las tablas
-    document.querySelector('#symbolSummary tbody').innerHTML = '';
-    document.querySelector('#allTrades tbody').innerHTML = '';
-    document.querySelector('#dailyAnalysis tbody').innerHTML = '';
-    document.querySelector('#riskAnalysis tbody').innerHTML = '';
-    
-    // Resetear métricas
-    const metrics = ['totalPnL', 'winRate', 'totalTrades', 'avgPnL', 'bestTrade', 'worstTrade', 
-                    'maxDrawdown', 'sharpeRatio', 'profitFactor', 'avgWin', 'avgLoss', 'riskReward'];
-    
-    metrics.forEach(metric => {
-        const element = document.getElementById(metric);
-        if (element) {
-            element.textContent = metric.includes('Rate') || metric.includes('Drawdown') ? '0%' : 
-                                 metric.includes('Ratio') || metric === 'profitFactor' || metric === 'riskReward' ? '0.00' : '$0.00';
-            element.className = 'metric-value';
-        }
-    });
-    
-    document.getElementById('strategicRecommendations').innerHTML = '<li>No hay datos para analizar</li>';
-    
-    showNotification('🔄 Datos reseteados', 'info');
-}
-
-// Función para validar datos antes del análisis
-function validateData() {
-    if (!trades || trades.length === 0) {
-        showNotification('⚠️ No hay datos de trading para analizar', 'warning');
-        return false;
+// Habilitar el botón de descarga cuando se carguen datos
+document.getElementById('csvFile').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        document.getElementById('downloadExcel').disabled = false;
     }
+});
+
+// Agregar evento al botón de descarga
+document.getElementById('downloadExcel').addEventListener('click', exportToExcel);
+
+// Agregar función para validar el formato CSV
+function validateCSV(data) {
+    const requiredHeaders = [
+        'Contracts',
+        'Closing Direction',
+        'Qty',
+        'Entry Price',
+        'Exit Price',
+        'Closed P&L',
+        'Exit Type',
+        'Trade Time(UTC+0)',
+        'Order No.',
+        'Create Time'
+    ];
+
+    const headers = data[0];
+    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
     
-    const invalidTrades = trades.filter(trade => 
-        !trade['Closed P&L'] || 
-        !trade['Entry Price'] || 
-        !trade['Exit Price'] || 
-        !trade.Contracts ||
-        isNaN(parseFloat(trade['Closed P&L']))
-    );
-    
-    if (invalidTrades.length > 0) {
-        showNotification(`⚠️ Se encontraron ${invalidTrades.length} operaciones con datos inválidos`, 'warning');
-        console.warn('Operaciones inválidas:', invalidTrades);
+    if (missingHeaders.length > 0) {
+        throw new Error(`Faltan las siguientes columnas requeridas: ${missingHeaders.join(', ')}`);
     }
     
     return true;
 }
 
-// Función para manejar errores globales
-function handleError(error, context = 'Aplicación') {
-    console.error(`Error en ${context}:`, error);
-    showNotification(`❌ Error en ${context}: ${error.message}`, 'error');
-}
-
-// Event listeners y inicialización
-document.addEventListener('DOMContentLoaded', function() {
+// Modificar la función parseCSV para incluir validación
+function parseCSV(csvText) {
     try {
-        // Mostrar mensaje de carga
-        showNotification('📊 Cargando análisis de trading...', 'info');
+        if (!csvText) return [];
         
-        // Validar y calcular métricas
-        if (validateData()) {
-            calculateMetrics();
-            showNotification('✅ Análisis completado exitosamente', 'success');
-        }
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) throw new Error('CSV vacío o inválido');
         
-        // Agregar event listeners para funcionalidades adicionales
-        document.addEventListener('keydown', function(e) {
-            // Ctrl/Cmd + E para exportar Excel
-            if ((e.ctrlKey || e.metaKey) && e.key === 'e') {
-                e.preventDefault();
-                downloadExcel();
-            }
-            
-            // Ctrl/Cmd + J para exportar JSON
-            if ((e.ctrlKey || e.metaKey) && e.key === 'j') {
-                e.preventDefault();
-                exportAsJSON();
-            }
-            
-            // Ctrl/Cmd + R para resetear (prevenir recarga de página)
-            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
-                e.preventDefault();
-                resetData();
-                calculateMetrics();
-            }
-        });
-        
-    } catch (error) {
-        handleError(error, 'Inicialización');
-    }
-});
+        const headers = lines[0].split(',');
+        const data = [];
 
-// Exponer funciones globales necesarias
-window.showTab = showTab;
-window.downloadExcel = downloadExcel;
-window.exportAsJSON = exportAsJSON;
-window.resetData = resetData;
+        // Validar formato
+        validateCSV([headers]);
+
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length !== headers.length) {
+                console.warn(`Línea ${i + 1} tiene un número incorrecto de valores`);
+                continue;
+            }
+            const row = {};
+            headers.forEach((header, index) => {
+                row[header] = values[index];
+            });
+            data.push(row);
+        }
+        return data;
+    } catch (error) {
+        console.error('Error al procesar CSV:', error);
+        alert('Error al procesar el archivo CSV: ' + error.message);
+        return [];
+    }
+}
