@@ -1,161 +1,266 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Análisis de Trading - Excel Interactivo</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imperio del Trading - Análisis Sith</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/styles/sith-theme.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
+    <div class="sith-container">
+        <!-- Header Imperial -->
+        <header class="imperial-header">
+            <div class="sith-logo">
+                <div class="empire-symbol">⚫</div>
+                <h1 class="sith-title">IMPERIO DEL TRADING</h1>
+                <p class="sith-subtitle">El poder del lado oscuro en tus operaciones, Darth Luke</p>
+            </div>
+            
+            <div class="command-center">
+                <button id="uploadButton" class="sith-button primary">
+                    <span class="button-glow"></span>
+                    <span class="button-text">CARGAR DATOS DEL IMPERIO</span>
+                </button>
+                <input type="file" id="csvFile" accept=".csv" style="display: none;">
+            </div>
+        </header>
 
-    <!-- Cabecera -->
-    <div class="header">
-      <h1>📊 Análisis de Trading Profesional</h1>
-      <p>Análisis detallado de operaciones de derivados para optimización de estrategias</p>
-      <div class="file-upload">
-        <button id="uploadButton" class="upload-button">📁 Cargar archivo CSV</button>
-        <input type="file" id="csvFile" accept=".csv" class="file-input" style="display: none;" />
-      </div>
-    </div>
+        <!-- Mensaje de Bienvenida Sith -->
+        <section class="dark-side-welcome" id="welcomeSection">
+            <div class="sith-card">
+                <h2 class="dark-title">Bienvenido al Lado Oscuro del Trading</h2>
+                <div class="sith-quote">
+                    <p>"El miedo lleva a la ira, la ira lleva al odio, el odio lleva al sufrimiento... pero también a las ganancias."</p>
+                    <span class="quote-author">- Maestro Sith del Trading</span>
+                </div>
+                <div class="power-features">
+                    <div class="feature-item">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Poder Absoluto</h3>
+                        <p>Análisis completo de tus operaciones con la precisión del Imperio</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🔴</div>
+                        <h3>Visión Sith</h3>
+                        <p>Gráficos y métricas que revelan los secretos del mercado</p>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">⚔️</div>
+                        <h3>Estrategia Imperial</h3>
+                        <p>Optimización de estrategias con la sabiduría del lado oscuro</p>
+                    </div>
+                </div>
+                <div class="cta-section">
+                    <p class="cta-text">Carga tu archivo CSV y desata el poder del Imperio en tus trades</p>
+                    <div class="supported-exchanges">
+                        <span>Exchanges del Imperio:</span>
+                        <div class="exchange-badges">
+                            <span class="exchange-badge">ZoomEx</span>
+                            <span class="exchange-badge">Libertex</span>
+                            <span class="exchange-badge">BitGet</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <!-- Modal: Selección de Exchange -->
-    <div id="exchangeModal" class="modal" style="display: none;">
-      <div class="modal-content">
-        <h2>Seleccione su Exchange</h2>
-        <p>Seleccione el exchange del cual descargó su archivo CSV</p>
-        <div class="exchange-options">
-          <div class="exchange-option" data-exchange="zoomex">
-            <img src="assets/images/zoomex-logo.png" alt="ZoomEx" />
-            <h3>ZoomEx</h3>
-          </div>
-          <div class="exchange-option" data-exchange="libertex">
-            <img src="assets/images/libertex-logo.png" alt="Libertex" />
-            <h3>Libertex</h3>
-          </div>
-          <div class="exchange-option" data-exchange="bitget">
-            <img src="assets/images/bitget-logo.png" alt="BitGet" />
-            <h3>BitGet</h3>
-          </div>
+        <!-- Modal de Selección de Exchange -->
+        <div id="exchangeModal" class="sith-modal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Selecciona tu Plataforma Imperial</h2>
+                    <p>Elige la fuente de tus datos de trading</p>
+                </div>
+                <div class="exchange-grid">
+                    <div class="exchange-option" data-exchange="zoomex">
+                        <div class="exchange-logo">Z</div>
+                        <h3>ZoomEx</h3>
+                        <p>Plataforma de élite del Imperio</p>
+                    </div>
+                    <div class="exchange-option" data-exchange="libertex">
+                        <div class="exchange-logo">L</div>
+                        <h3>Libertex</h3>
+                        <p>Arsenal financiero imperial</p>
+                    </div>
+                    <div class="exchange-option" data-exchange="bitget">
+                        <div class="exchange-logo">B</div>
+                        <h3>BitGet</h3>
+                        <p>Fortaleza cripto del Imperio</p>
+                    </div>
+                </div>
+                <button class="modal-close" id="closeExchangeModal">✕</button>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Modal: Error -->
-    <div id="errorModal" class="modal error-modal" style="display: none;">
-      <div class="modal-content">
-        <h2>Error</h2>
-        <p id="errorMessage">Error al procesar el archivo CSV. Verifica que el formato sea correcto.</p>
-        <button id="errorModalCloseBtn">Aceptar</button>
-      </div>
-    </div>
-
-    <!-- Navegación por pestañas -->
-    <div class="tabs">
-      <div class="tab active" onclick="showTab('resumen')">📈 Resumen</div>
-      <div class="tab" onclick="showTab('operaciones')">📋 Operaciones</div>
-      <div class="tab" onclick="showTab('analisis')">🔍 Análisis</div>
-      <div class="tab" onclick="showTab('estrategias')">💡 Estrategias</div>
-    </div>
-
-    <!-- Tab: Resumen -->
-    <div id="resumen" class="tab-content active">
-      <div class="summary-grid">
-        <!-- Columna Principal de Métricas -->
-        <div class="main-metrics">
-          <div class="metric-card primary">
-            <div class="metric-label">P&L Total</div>
-            <div class="metric-value" id="totalPnL">$0.00</div>
-          </div>
-          <div class="metric-card secondary">
-            <div class="metric-label">Tasa de Éxito</div>
-            <div class="metric-value" id="winRate">0%</div>
-          </div>
+        <!-- Modal de Error -->
+        <div id="errorModal" class="sith-modal error">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="error-icon">⚠️</div>
+                <h2>Perturbación en la Fuerza</h2>
+                <p id="errorMessage">Ha ocurrido un error en el Imperio</p>
+                <button class="sith-button secondary" id="closeErrorModal">ENTENDIDO</button>
+            </div>
         </div>
 
-        <!-- Métricas Secundarias -->
-        <div class="secondary-metrics">
-          <div class="metric-card">
-            <div class="metric-label">Total Operaciones</div>
-            <div class="metric-value" id="totalTrades">0</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Ganadoras</div>
-            <div class="metric-value positive" id="winningTrades">0</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Perdedoras</div>
-            <div class="metric-value negative" id="losingTrades">0</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Mejor Op.</div>
-            <div class="metric-value" id="bestTrade">$0.00</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Peor Op.</div>
-            <div class="metric-value" id="worstTrade">$0.00</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Profit Factor</div>
-            <div class="metric-value" id="profitFactor">0.00</div>
-          </div>
-        </div>
-      </div>
+        <!-- Dashboard Principal -->
+        <main class="imperial-dashboard" id="dashboard" style="display: none;">
+            <!-- Navegación Sith -->
+            <nav class="sith-navigation">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="resumen">
+                        <span class="tab-icon">📊</span>
+                        <span>RESUMEN IMPERIAL</span>
+                    </button>
+                    <button class="nav-tab" data-tab="operaciones">
+                        <span class="tab-icon">⚔️</span>
+                        <span>OPERACIONES</span>
+                    </button>
+                    <button class="nav-tab" data-tab="grafico">
+                        <span class="tab-icon">🔴</span>
+                        <span>VISIÓN SITH</span>
+                    </button>
+                    <button class="nav-tab" data-tab="analisis">
+                        <span class="tab-icon">🧠</span>
+                        <span>ANÁLISIS</span>
+                    </button>
+                    <button class="nav-tab" data-tab="estrategias">
+                        <span class="tab-icon">🎯</span>
+                        <span>ESTRATEGIAS</span>
+                    </button>
+                </div>
+            </nav>
 
-      <div class="chart-container">
-        <canvas id="symbolPnlChart"></canvas>
-      </div>
+            <!-- Contenido de Tabs -->
+            <div class="tab-content">
+                <!-- Tab Resumen -->
+                <div id="resumen" class="tab-panel active">
+                    <div class="metrics-grid">
+                        <div class="metric-card primary">
+                            <div class="metric-icon">💰</div>
+                            <div class="metric-content">
+                                <h3>P&L TOTAL</h3>
+                                <div class="metric-value" id="totalPnl">$0.00</div>
+                                <div class="metric-change" id="pnlChange">Poder del Imperio</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">⚔️</div>
+                            <div class="metric-content">
+                                <h3>OPERACIONES</h3>
+                                <div class="metric-value" id="totalTrades">0</div>
+                                <div class="metric-change">Batallas libradas</div>
+                            </div>
+                        </div>
+                        <div class="metric-card success">
+                            <div class="metric-icon">🏆</div>
+                            <div class="metric-content">
+                                <h3>VICTORIAS</h3>
+                                <div class="metric-value" id="winningTrades">0</div>
+                                <div class="metric-change">Triunfos imperiales</div>
+                            </div>
+                        </div>
+                        <div class="metric-card danger">
+                            <div class="metric-icon">💥</div>
+                            <div class="metric-content">
+                                <h3>DERROTAS</h3>
+                                <div class="metric-value" id="losingTrades">0</div>
+                                <div class="metric-change">Lecciones aprendidas</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">📈</div>
+                            <div class="metric-content">
+                                <h3>TASA DE ÉXITO</h3>
+                                <div class="metric-value" id="winRate">0%</div>
+                                <div class="metric-change">Dominio Sith</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon">⚡</div>
+                            <div class="metric-content">
+                                <h3>PROFIT FACTOR</h3>
+                                <div class="metric-value" id="profitFactor">0.00</div>
+                                <div class="metric-change">Poder multiplicador</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      <div class="table-container">
-        <div class="table-header">📊 Resumen por Símbolo</div>
-        <table id="symbolSummary">
-          <thead>
-            <tr>
-              <th>Símbolo</th>
-              <th>Operaciones</th>
-              <th>P&L Total</th>
-              <th>P&L Promedio</th>
-              <th>Tasa Éxito</th>
-              <th>Mejor</th>
-              <th>Peor</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
+                <!-- Tab Operaciones -->
+                <div id="operaciones" class="tab-panel">
+                    <div class="operations-section">
+                        <h2 class="section-title">Registro de Batallas Imperiales</h2>
+                        <div class="table-container">
+                            <table class="sith-table" id="tradesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Símbolo</th>
+                                        <th>Tipo</th>
+                                        <th>Volumen</th>
+                                        <th>Trade Entrada</th>
+                                        <th>Precio Salida</th>
+                                        <th>P&L</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Los trades se insertarán aquí dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Gráfico -->
+                <div id="grafico" class="tab-panel">
+                    <div class="chart-section">
+                        <h2 class="section-title">Visión del Lado Oscuro</h2>
+                        <div class="chart-container">
+                            <canvas id="pnlChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Análisis -->
+                <div id="analisis" class="tab-panel">
+                    <div class="analysis-section">
+                        <h2 class="section-title">Análisis Imperial</h2>
+                        <div class="analysis-grid">
+                            <div class="analysis-card">
+                                <h3>Símbolos Más Rentables</h3>
+                                <div id="topSymbols"></div>
+                            </div>
+                            <div class="analysis-card">
+                                <h3>Patrones de Trading</h3>
+                                <div id="tradingPatterns"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Estrategias -->
+                <div id="estrategias" class="tab-panel">
+                    <div class="strategies-section">
+                        <h2 class="section-title">Estrategias del Imperio</h2>
+                        <div class="strategy-recommendations" id="strategyRecommendations">
+                            <p>Carga tus datos para recibir estrategias personalizadas del lado oscuro.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Imperial -->
+        <footer class="imperial-footer">
+            <p>© 2024 Imperio del Trading - Desarrollado por el poder del lado oscuro para Darth Luke</p>
+            <p class="sith-motto">"Solo a través del conflicto se revela la verdadera fuerza"</p>
+        </footer>
     </div>
 
-    <!-- Tab: Operaciones -->
-    <div id="operaciones" class="tab-content">
-      <div class="table-container">
-        <div class="table-header">📋 Todas las Operaciones</div>
-        <table id="allTrades">
-          <thead>
-            <tr>
-              <th>Símbolo</th>
-              <th>Dirección</th>
-              <th>Cantidad</th>
-              <th>Precio Entrada</th>
-              <th>Precio Salida</th>
-              <th>P&L</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Otros tabs futuros: análisis y estrategias -->
-    <div id="analisis" class="tab-content" style="display: none;"></div>
-    <div id="estrategias" class="tab-content" style="display: none;"></div>
-    
-  </div>
-
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <script src="script.js"></script>
+    <script type="module" src="src/js/sith-app.js"></script>
 </body>
 </html>

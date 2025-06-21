@@ -1,0 +1,261 @@
+.chart-section {
+    margin: 30px 0;
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #333;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.chart-header h2 {
+    color: #fafafa;
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.chart-toggle-btn {
+    background: #ec4d58;
+    color: #fafafa;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.chart-toggle-btn:hover {
+    background: #d63447;
+}
+
+.chart-container-large {
+    background: #121212;
+    border-radius: 8px;
+    padding: 30px;
+    border: 1px solid #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    width: 100%;
+    position: relative;
+}
+
+.chart-container-large canvas {
+    max-width: 400px !important;
+    max-height: 400px !important;
+    width: 400px !important;
+    height: 400px !important;
+    display: block !important;
+}
+
+#symbolPnlChart {
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+@media (max-width: 768px) {
+    .chart-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .chart-container-large {
+        padding: 20px;
+        min-height: 300px;
+    }
+    
+    .chart-container-large canvas {
+        max-width: 300px !important;
+        max-height: 300px !important;
+        width: 300px !important;
+        height: 300px !important;
+    }
+}
+
+.chart-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr 250px;
+    gap: 30px;
+    height: 100%;
+    align-items: start;
+}
+
+.chart-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+}
+
+.chart-main canvas {
+    max-width: 500px !important;
+    max-height: 500px !important;
+}
+
+.chart-sidebar {
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #334155;
+}
+
+.chart-sidebar h3 {
+    color: #f1f5f9;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.symbol-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.symbol-item {
+    background: #0f172a;
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.symbol-item.positive {
+    border-left-color: #4ade80;
+}
+
+.symbol-item.negative {
+    border-left-color: #f87171;
+}
+
+.symbol-name {
+    font-weight: 600;
+    color: #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.symbol-pnl {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.symbol-percentage {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+@media (max-width: 1200px) {
+    .chart-layout {
+        grid-template-columns: 200px 1fr 200px;
+        gap: 20px;
+    }
+    
+    .chart-sidebar {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .chart-main {
+        order: 1;
+    }
+    
+    .chart-sidebar.left {
+        order: 2;
+    }
+    
+    .chart-sidebar.right {
+        order: 3;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+#symbolPnlChart {
+    max-height: 100%;
+    max-width: 100%;
+    background: transparent;
+}
+
+.chart-container canvas {
+    border-radius: 8px;
+    background: transparent !important;
+}
+
+/* Mensaje cuando no hay datos */
+.chart-container:empty::before {
+    content: "📊 Carga un archivo CSV para ver el gráfico";
+    color: #666;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chart-container {
+        height: 250px;
+        padding: 10px;
+    }
+}
+
+.chart-section-full {
+    margin: 30px 0;
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 30px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.chart-container-centered {
+    background: #121212;
+    border-radius: 8px;
+    padding: 40px;
+    border: 1px solid #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.chart-container-centered canvas {
+    max-width: 100% !important;
+    max-height: 400px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+#symbolPnlChart {
+    display: block !important;
+}

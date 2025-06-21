@@ -1,0 +1,125 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(18, 18, 18, 0.9);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 30px;
+    border: 1px solid #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+    position: relative;
+    margin: auto;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-content h2 {
+    color: #fafafa;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.modal-content p {
+    color: #fafafa;
+    margin-bottom: 25px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.exchange-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.exchange-option {
+    background: #121212;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.exchange-option:hover {
+    border-color: #ec4d58;
+    background: #1f1f1f;
+    transform: translateY(-2px);
+}
+
+.exchange-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.exchange-option h3 {
+    color: #fafafa;
+    font-size: 1rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+.error-modal .modal-content {
+    max-width: 350px;
+    text-align: center;
+}
+
+.error-modal button {
+    background: #ec4d58;
+    color: #fafafa;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+    margin-top: 15px;
+}
+
+.error-modal button:hover {
+    background: #d63447;
+}
+
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 20px;
+        margin: 10px;
+    }
+}

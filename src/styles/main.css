@@ -1,0 +1,286 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #121212;
+    color: #fafafa;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Descripción introductoria minimalista */
+.intro-description {
+    margin: 40px 0;
+    display: block;
+}
+
+.intro-card {
+    background: #1a1a1a;
+    border-radius: 8px;
+    padding: 40px;
+    border: 1px solid #333;
+    text-align: center;
+}
+
+.intro-card h2 {
+    color: #fafafa;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.intro-card p {
+    color: #fafafa;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+.intro-card ul {
+    list-style: none;
+    margin: 30px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    text-align: left;
+}
+
+.intro-card li {
+    background: #1f1f1f;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 3px solid #ec4d58;
+    color: #fafafa;
+}
+
+.cta-text {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #ec4d58;
+    font-weight: 500;
+    margin-top: 30px;
+}
+
+/* Ocultar contenido excepto header inicialmente */
+.content-hidden .tabs,
+.content-hidden .tab-content,
+.content-hidden .summary-grid,
+.content-hidden .chart-section,
+.content-hidden .table-container {
+    display: none !important;
+}
+
+/* Ocultar descripción cuando se carga contenido */
+.content-visible .intro-description {
+    display: none !important;
+}
+
+/* Mostrar contenido cuando se carga CSV */
+.content-visible .tabs,
+.content-visible .tab-content,
+.content-visible .summary-grid,
+.content-visible .chart-section,
+.content-visible .table-container {
+    display: block;
+}
+
+.content-visible .summary-grid {
+    display: grid;
+}
+
+.positive {
+    color: #4ade80 !important;
+}
+
+.negative {
+    color: #ec4d58 !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .intro-card {
+        padding: 20px;
+    }
+    
+    .intro-card h2 {
+        font-size: 1.5rem;
+    }
+}
+
+
+/* Copyright Sith */
+.sith-copyright {
+    margin-top: 50px;
+    padding: 30px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border: 1px solid #333;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.sith-copyright::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(236, 77, 88, 0.1), transparent);
+    animation: sithGlow 3s infinite;
+}
+
+@keyframes sithGlow {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.sith-copyright p {
+    color: #fafafa;
+    font-style: italic;
+    margin: 10px 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+}
+
+.sith-copyright strong {
+    color: #ec4d58;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(236, 77, 88, 0.3);
+}
+
+.sith-signature {
+    font-size: 0.8rem !important;
+    opacity: 0.7;
+    margin-top: 15px !important;
+    color: #ec4d58 !important;
+}
+
+
+/* Análisis y Estrategias */
+.analysis-container, .strategies-container {
+    padding: 20px 0;
+}
+
+.analysis-container h2, .strategies-container h2 {
+    color: #fafafa;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.analysis-grid, .strategies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.analysis-card, .strategy-card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    transition: transform 0.2s ease;
+}
+
+.analysis-card:hover, .strategy-card:hover {
+    transform: translateY(-2px);
+    border-color: #ec4d58;
+}
+
+.analysis-card h3, .strategy-card h3 {
+    color: #ec4d58;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.analysis-content, .strategy-content {
+    color: #fafafa;
+}
+
+.analysis-content p {
+    margin: 8px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.strategy-content ul {
+    list-style: none;
+    padding: 0;
+}
+
+.strategy-content li {
+    margin: 10px 0;
+    padding: 8px 12px;
+    background: #121212;
+    border-radius: 4px;
+    border-left: 3px solid #ec4d58;
+}
+
+.action-plan {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.action-plan h3 {
+    color: #ec4d58;
+    margin-bottom: 15px;
+}
+
+.action-content ol {
+    color: #fafafa;
+    padding-left: 20px;
+}
+
+.action-content li {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+@import url('./base/reset.css');
+@import url('./components/intro.css');
+@import url('./components/visibility.css');
+@import url('./components/sith-theme.css');
+
+/* Estilos específicos que no encajan en otros módulos */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 768px) {
+    .summary-grid {
+        grid-template-columns: 1fr 2fr;
+    }
+}
