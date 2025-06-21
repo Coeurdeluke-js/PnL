@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis de Trading - Excel Interactivo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+
+    <!-- Cabecera -->
+    <div class="header">
+      <h1>📊 Análisis de Trading Profesional</h1>
+      <p>Análisis detallado de operaciones de derivados para optimización de estrategias</p>
+      <div class="file-upload">
+        <button id="uploadButton" class="upload-button">📁 Cargar archivo CSV</button>
+        <input type="file" id="csvFile" accept=".csv" class="file-input" style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Modal: Selección de Exchange -->
+    <div id="exchangeModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <h2>Seleccione su Exchange</h2>
+        <p>Seleccione el exchange del cual descargó su archivo CSV</p>
+        <div class="exchange-options">
+          <div class="exchange-option" data-exchange="zoomex">
+            <img src="assets/images/zoomex-logo.png" alt="ZoomEx" />
+            <h3>ZoomEx</h3>
+          </div>
+          <div class="exchange-option" data-exchange="libertex">
+            <img src="assets/images/libertex-logo.png" alt="Libertex" />
+            <h3>Libertex</h3>
+          </div>
+          <div class="exchange-option" data-exchange="bitget">
+            <img src="assets/images/bitget-logo.png" alt="BitGet" />
+            <h3>BitGet</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Error -->
+    <div id="errorModal" class="modal error-modal" style="display: none;">
+      <div class="modal-content">
+        <h2>Error</h2>
+        <p id="errorMessage">Error al procesar el archivo CSV. Verifica que el formato sea correcto.</p>
+        <button id="errorModalCloseBtn">Aceptar</button>
+      </div>
+    </div>
+
+    <!-- Navegación por pestañas -->
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('resumen')">📈 Resumen</div>
+      <div class="tab" onclick="showTab('operaciones')">📋 Operaciones</div>
+      <div class="tab" onclick="showTab('analisis')">🔍 Análisis</div>
+      <div class="tab" onclick="showTab('estrategias')">💡 Estrategias</div>
+    </div>
+
+    <!-- Tab: Resumen -->
+    <div id="resumen" class="tab-content active">
+      <div class="summary-grid">
+        <!-- Columna Principal de Métricas -->
+        <div class="main-metrics">
+          <div class="metric-card primary">
+            <div class="metric-label">P&L Total</div>
+            <div class="metric-value" id="totalPnL">$0.00</div>
+          </div>
+          <div class="metric-card secondary">
+            <div class="metric-label">Tasa de Éxito</div>
+            <div class="metric-value" id="winRate">0%</div>
+          </div>
+        </div>
+
+        <!-- Métricas Secundarias -->
+        <div class="secondary-metrics">
+          <div class="metric-card">
+            <div class="metric-label">Total Operaciones</div>
+            <div class="metric-value" id="totalTrades">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Ganadoras</div>
+            <div class="metric-value positive" id="winningTrades">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Perdedoras</div>
+            <div class="metric-value negative" id="losingTrades">0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Mejor Op.</div>
+            <div class="metric-value" id="bestTrade">$0.00</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Peor Op.</div>
+            <div class="metric-value" id="worstTrade">$0.00</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Profit Factor</div>
+            <div class="metric-value" id="profitFactor">0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="symbolPnlChart"></canvas>
+      </div>
+
+      <div class="table-container">
+        <div class="table-header">📊 Resumen por Símbolo</div>
+        <table id="symbolSummary">
+          <thead>
+            <tr>
+              <th>Símbolo</th>
+              <th>Operaciones</th>
+              <th>P&L Total</th>
+              <th>P&L Promedio</th>
+              <th>Tasa Éxito</th>
+              <th>Mejor</th>
+              <th>Peor</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab: Operaciones -->
+    <div id="operaciones" class="tab-content">
+      <div class="table-container">
+        <div class="table-header">📋 Todas las Operaciones</div>
+        <table id="allTrades">
+          <thead>
+            <tr>
+              <th>Símbolo</th>
+              <th>Dirección</th>
+              <th>Cantidad</th>
+              <th>Precio Entrada</th>
+              <th>Precio Salida</th>
+              <th>P&L</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Otros tabs futuros: análisis y estrategias -->
+    <div id="analisis" class="tab-content" style="display: none;"></div>
+    <div id="estrategias" class="tab-content" style="display: none;"></div>
+    
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
